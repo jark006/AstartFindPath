@@ -1,4 +1,4 @@
-﻿// 
+﻿// Lib Required https://easyx.cn
 //
 
 #include "pch.h"
@@ -21,7 +21,7 @@ using namespace std;
 
 int main(int argc, char** argv)
 {
-	BMPImage bmpImage1("E:\\map4.bmp");//24bit BGR BMP
+	BMPImage bmpImage1("..\\map.bmp");//24bit BGR BMP
 
 	cout << bmpImage1.width() << '*' << bmpImage1.height() << endl;
 
@@ -30,11 +30,14 @@ int main(int argc, char** argv)
 	setfillcolor(WHITE);
 	setlinecolor(RED);
 
-	AStar::Vec2i start{ 20, 50 }, target{ 160, 160 }; //起点{x, y}，终点{x, y}
+	AStar::Vec2i start{ 3, 3 }, target{ 185, 122 }; //起点{x, y}，终点{x, y}
 	AStar::Generator generator;
 	generator.setWorldSize({ bmpImage1.width(), bmpImage1.height() });//map Size
 	generator.setHeuristic(AStar::Heuristic::euclidean);//启发式：欧几里得 sqrt(x^2 + y^2)
 	generator.setDiagonalMovement(true);//true:8个方向 false:4个方向
+
+	cout << "start:{ x=" << start.x << ", y=" << start.y << "}\r\n";
+	cout << "target:{ x=" << target.x << ", y=" << target.y << "}\r\n";
 
 	BeginBatchDraw();
 	//读取BMP, 放置障碍物，图片白色像素(RGB=255/255/255)为空闲
@@ -59,14 +62,21 @@ int main(int argc, char** argv)
 	BeginBatchDraw();
 	//Ptint the coordinateList of Path (targetPoint to startPoint)
 	for (auto& coordinate : path) {
-		std::cout << coordinate.x << " " << coordinate.y << "\n";
+		std::cout << '{' << coordinate.x << ", " << coordinate.y << "} <- ";
 		putpixel(coordinate.x, coordinate.y, RGB(255, 0, 0));
 	}
 	putpixel(start.x, start.y, RGB(0, 255, 0));   //GREEN
 	putpixel(target.x, target.y, RGB(0, 0, 255)); //BLUE
 	EndBatchDraw();
 
-	cout << "Times:" << t2 - t1 << 's' << endl;
+	cout << "\r\nTimes:" << t2 - t1 << 's' << endl;
+
+	// 保存绘制的图像
+	wstring s =L"..\\path_" + to_wstring(time(NULL)) + L".bmp";
+	saveimage(s.c_str());
+	cout << "寻路结果已保存到：";
+	wcout << s;
+	cout << endl;
 
 	system("pause");
 }
